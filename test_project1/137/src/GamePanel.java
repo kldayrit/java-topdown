@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -39,7 +38,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	GamePanel(){
 		this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
-		this.setBackground(Color.black);
+		this.setBackground(Color.white);
 		this.setFocusable(true);
 		this.addKeyListener(new MyKeyAdapter());
 
@@ -90,7 +89,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				g.setColor(Color.decode(mColors[i+4]));
 				for(int j=0; j<GAME_UNITS; j++){
 					if ((p.bulletX[j] !=-1 ) || (p.bulletY[j] !=-1 ) || (p.bulletDirection[j] != 'A')){
-						g.fillOval(p.bulletX[j], p.bulletY[j], UNIT_SIZE/2, UNIT_SIZE/2);
+						g.fillOval(p.bulletX[j], p.bulletY[j], UNIT_SIZE, UNIT_SIZE/2);
 					}
 				}
 			}
@@ -106,6 +105,10 @@ public class GamePanel extends JPanel implements ActionListener {
 		} else {
 			gameOver(g);
 		}
+	}
+	
+	public void terrain() {
+		
 	}
 
 	public void move(){
@@ -180,11 +183,11 @@ public class GamePanel extends JPanel implements ActionListener {
 			Player b = this.players.get(i);
 			for(int j=0; j<GAME_UNITS;j++){
 				// if tumama bullet ng kalaban sa player
-				if(((b.bulletX[j] >= p.x) && (b.bulletX[j] <= p.x+UNIT_SIZE)) && ((b.bulletY[j] >= p.y) && (b.bulletY[j] <= p.y+UNIT_SIZE)) && b.alive){
+				if(((b.bulletX[j] >= p.x) && (b.bulletX[j] <= p.x+UNIT_SIZE-1)) && ((b.bulletY[j] >= p.y) && (b.bulletY[j] <= p.y+UNIT_SIZE-1)) && b.alive){
 					running = false;
 				}
 				// if tumama bullet ng player sa kalaban
-				if(((p.bulletX[j] >= b.x) && (p.bulletX[j] <= b.x+UNIT_SIZE)) && ((p.bulletY[j] >= b.y) && (p.bulletY[j] <= b.y+UNIT_SIZE)) && b.alive){
+				if(((p.bulletX[j] >= b.x) && (p.bulletX[j] <= b.x+UNIT_SIZE-1)) && ((p.bulletY[j] >= b.y) && (p.bulletY[j] <= b.y+UNIT_SIZE-1)) && b.alive){
 					b.alive = false;
 					score++;
 					// respawn dito muna
