@@ -1,5 +1,10 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Random;
@@ -9,9 +14,9 @@ public class GamePanel extends JPanel implements ActionListener {
 	static final int SCREEN_WIDTH= 1200;
 	static final int SCREEN_HEIGHT= 600;
 
-	static final int UNIT_SIZE = 25;
+	static final int UNIT_SIZE = 30;
 	static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
-	static final int DELAY = 75;
+	static final int DELAY = 120;
 
 
 	boolean running = false;
@@ -19,14 +24,14 @@ public class GamePanel extends JPanel implements ActionListener {
 	int score =0;
 
 	String[] mColors = {
-            "#39add1", // light blue
-            "#c25975", // mauve
-            "#838cc7", // lavender
-            "#f092b0", // pink
-            "#3079ab", // dark blue
-            "#e15258", // red
-            "#7d669e", // purple
-            "#b7c0c7" // light gray
+            "src/images/tile_0084.png", // p1
+            "src/images/tile_0085.png", // p2
+            "src/images/tile_0086.png", // p3
+            "src/images/tile_0087.png", // p4
+            "src/images/tile_0110.png", // p1 bullet
+            "src/images/tile_0118.png", // p2 bullet
+            "src/images/tile_0116.png", // p3 bullet
+            "src/images/tile_0106.png"  // p4 bullet
     };
 
 	Timer timer;
@@ -35,6 +40,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	// pang 4 players
 	ArrayList<Player> players;
+
+	BufferedImage image;
 
 	GamePanel(){
 		this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -48,6 +55,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		this.players.add(new Player(SCREEN_WIDTH- UNIT_SIZE,0,'D'));
 		this.players.add(new Player(SCREEN_WIDTH- UNIT_SIZE,SCREEN_HEIGHT- UNIT_SIZE,'L'));
 		this.players.add(new Player(0,SCREEN_HEIGHT- UNIT_SIZE,'U'));
+
 
 		startGame();
 	}
@@ -65,6 +73,17 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void draw(Graphics g){
 		if(running){
+			try {
+	            image = ImageIO.read(new File("src/images/tile_0049.png"));
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+			for(int i =0; i<SCREEN_WIDTH;i+=UNIT_SIZE){
+				for(int j =0; j<SCREEN_HEIGHT;j+=UNIT_SIZE){
+					g.drawImage(image,i, j, UNIT_SIZE, UNIT_SIZE, null);
+				}
+			}
+
 			// grids para lang makita
 			for(int i=0; i<SCREEN_WIDTH/UNIT_SIZE;i++){
 				g.drawLine(i*UNIT_SIZE, 0, i*UNIT_SIZE, SCREEN_HEIGHT); // vertical
@@ -76,9 +95,13 @@ public class GamePanel extends JPanel implements ActionListener {
 			// draw player
 			for(int i = 0; i<this.players.size(); i++){
 				Player p = this.players.get(i);
-				g.setColor(Color.decode(mColors[i]));
+				try {
+		            image = ImageIO.read(new File(mColors[i]));
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		        }
 				if(p.alive == true){
-					g.fillRect(p.x, p.y, UNIT_SIZE, UNIT_SIZE);
+					g.drawImage(image,p.x, p.y, UNIT_SIZE, UNIT_SIZE, null);
 				}
 
 			}
@@ -86,10 +109,14 @@ public class GamePanel extends JPanel implements ActionListener {
 			// draw bullets
 			for(int i = 0; i<this.players.size(); i++){
 				Player p = this.players.get(i);
-				g.setColor(Color.decode(mColors[i+4]));
+				try {
+		            image = ImageIO.read(new File(mColors[i+4]));
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		        }
 				for(int j=0; j<GAME_UNITS; j++){
 					if ((p.bulletX[j] !=-1 ) || (p.bulletY[j] !=-1 ) || (p.bulletDirection[j] != 'A')){
-						g.fillOval(p.bulletX[j], p.bulletY[j], UNIT_SIZE, UNIT_SIZE/2);
+						g.drawImage(image,p.bulletX[j]+UNIT_SIZE/4, p.bulletY[j]+UNIT_SIZE/4, UNIT_SIZE/3*2, UNIT_SIZE/3*2, null);
 					}
 				}
 			}
@@ -100,15 +127,9 @@ public class GamePanel extends JPanel implements ActionListener {
 			FontMetrics metrics = getFontMetrics(g.getFont());
 			g.drawString("SCORE: " + score, (SCREEN_WIDTH - metrics.stringWidth("GAME OVER"))/2,100);
 
-
-
 		} else {
 			gameOver(g);
 		}
-	}
-	
-	public void terrain() {
-		
 	}
 
 	public void move(){
@@ -137,7 +158,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		for(int i=1;i<this.players.size(); i++){
 			Player p = this.players.get(i);
 			Random r = new Random();
-			if (r.nextInt(2) == 1){
+			if (r.nextInt(2) == 1 && p.alive){
 				switch(p.direction){
 				case 'U':
 					p.direction = 'R';
@@ -151,6 +172,15 @@ public class GamePanel extends JPanel implements ActionListener {
 				case 'R':
 					p.direction = 'D';
 					break;
+				}
+			}
+			if(p.alive == false){
+				p.respawn-=1;
+				// respawn
+				if (p.respawn == 0){
+					p.alive = true;
+					p.x = SCREEN_WIDTH/2;
+					p.y = SCREEN_HEIGHT/2;
 				}
 			}
 		}
@@ -190,10 +220,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				if(((p.bulletX[j] >= b.x) && (p.bulletX[j] <= b.x+UNIT_SIZE-1)) && ((p.bulletY[j] >= b.y) && (p.bulletY[j] <= b.y+UNIT_SIZE-1)) && b.alive){
 					b.alive = false;
 					score++;
-					// respawn dito muna
-					b.x = SCREEN_WIDTH/2;
-					b.y = SCREEN_HEIGHT/2;
-					b.alive = true;
+					b.respawn = 10;
 				}
 			}
 		}
