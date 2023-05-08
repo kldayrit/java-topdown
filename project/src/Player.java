@@ -15,7 +15,7 @@ public class Player {
 	private boolean hasShield = false;
 
 	static final int GAME_UNITS = (1200 * 600) / 25;
-	static final int UNIT_SIZE = 30;
+	static final int UNIT_SIZE = 50;
 
 	final int bulletX[] = new int[GAME_UNITS];
 	final int bulletY[] = new int[GAME_UNITS];
@@ -45,6 +45,10 @@ public class Player {
 		}
 	}
 
+	public Rectangle getBoundingBox() {
+        return new Rectangle(x, y, UNIT_SIZE, UNIT_SIZE);
+	}
+	
 	public void respawn(int width, int height) {
 		// respawn dito muna
 		if (width != 0 && height != 0) {

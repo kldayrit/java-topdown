@@ -8,7 +8,7 @@ public class PowerUps {
 	private int xPos, yPos; // position
 	private static BufferedImage image;
 
-	static final int UNIT_SIZE = 30;
+	static final int UNIT_SIZE = 50;
 
 	public final static String SHIELD_TYPE = "shield";
 	public final static String LASER_TYPE = "laser";
@@ -28,12 +28,16 @@ public class PowerUps {
 		}
 		// load the appropriate powerup image depending on its type
 		if (this.getType() == PowerUps.SHIELD_TYPE) {
-			loadImage("src/images/tile_0102.png");
+			loadImage("images/tile_0102.png");
 		} else if (this.getType() == PowerUps.LASER_TYPE) {
-			loadImage("src/images/tile_0116.png");
+			loadImage("images/tile_0116.png");
 		} else if (this.getType() == PowerUps.MULTI_TYPE) {
-			loadImage("src/images/tile_0113.png");
+			loadImage("images/tile_0113.png");
 		}
+	}
+	
+	public Rectangle getBoundingBox() {
+        return new Rectangle(xPos, yPos, UNIT_SIZE, UNIT_SIZE);
 	}
 
 	// returns the type of power up

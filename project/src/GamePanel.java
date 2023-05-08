@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,7 +15,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	static final int SCREEN_WIDTH = 1200;
 	static final int SCREEN_HEIGHT = 600;
 
-	static final int UNIT_SIZE = 30;
+	static final int UNIT_SIZE = 50;
 	static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
 	static final int DELAY = 90;
 
@@ -31,7 +32,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			"#b7c0c7" // light gray
 	};
 
-	Timer timer;
+	Timer timer, powerupTimer;
 	GameTimer gameTime;
 	JLabel timerLabel, scoreLabel;
 	int timeRemaining;
@@ -40,7 +41,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	// pang 4 players
 	ArrayList<Player> players;
-	ArrayList<PowerUps> powerups;
+	private List<PowerUps> powerups = new ArrayList<>();
 
 	BufferedImage background;
 	BufferedImage image;
@@ -54,6 +55,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		add(timerLabel);
 		this.scoreLabel = new JLabel("Score: ");
 		add(scoreLabel);
+
 		this.players = new ArrayList<Player>();
 		this.players.add(new Player(0, 0, 'R', "images/tile_0084.png"));
 		this.players.add(new Player(SCREEN_WIDTH - UNIT_SIZE, 0, 'D', "images/tile_0085.png"));
@@ -68,6 +70,13 @@ public class GamePanel extends JPanel implements ActionListener {
 		gameTime = new GameTimer(60);
 		timer = new Timer(DELAY, this);
 		timer.start();
+
+		powerupTimer = new Timer(10000, e -> { // spawn powerups every 10 seconds
+			if (this.powerups.size() < 3) {
+				spawnPowerups();
+			}
+		});
+		powerupTimer.start();
 	}
 
 	public void paintComponent(Graphics g) {
@@ -107,13 +116,18 @@ public class GamePanel extends JPanel implements ActionListener {
 				p.draw(g);
 			}
 
+			// draw powerups
+			for (PowerUps powerup : powerups) {
+				powerup.draw(g);
+			}
+
 			// draw bullets
 			for (int i = 0; i < this.players.size(); i++) {
 				Player p = this.players.get(i);
 				g.setColor(Color.decode(mColors[i + 4]));
 				for (int j = 0; j < GAME_UNITS; j++) {
 					if ((p.bulletX[j] != -1) || (p.bulletY[j] != -1) || (p.bulletDirection[j] != 'A')) {
-						g.fillOval(p.bulletX[j], p.bulletY[j], UNIT_SIZE / 2, UNIT_SIZE / 2);
+						g.fillOval(p.bulletX[j], p.bulletY[j], UNIT_SIZE / 3, UNIT_SIZE / 3);
 					}
 				}
 			}
@@ -181,6 +195,15 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 
+	public void spawnPowerups() {
+		Random rand = new Random();
+		int x = rand.nextInt(SCREEN_WIDTH - UNIT_SIZE) + UNIT_SIZE;
+		int y = rand.nextInt(SCREEN_HEIGHT - UNIT_SIZE) + UNIT_SIZE;
+		int type = rand.nextInt(3);
+		this.powerups.add(new PowerUps(x, y, type));
+		// TODO: add logic so powerups will not spawn on top of players and obstacles
+	}
+
 	public void checkCollisions() {
 		// left border
 		for (int i = 0; i < this.players.size(); i++) {
@@ -210,9 +233,14 @@ public class GamePanel extends JPanel implements ActionListener {
 				// if tumama bullet ng kalaban sa player
 				if (((b.bulletX[j] >= p.x) && (b.bulletX[j] <= p.x + UNIT_SIZE - 1))
 						&& ((b.bulletY[j] >= p.y) && (b.bulletY[j] <= p.y + UNIT_SIZE - 1)) && b.alive) {
-					p.alive = false;
-					// add delay
-					p.respawn(0, 0);
+					if(p.getHasShield() == true) {
+						p.setHasShield(false); // remove shield if hit by enemy bullet
+					} else {						
+						p.alive = false;
+						score--;
+						// add delay
+						p.respawn(0, 0);
+					}
 				}
 				// if tumama bullet ng player sa kalaban
 				if (((p.bulletX[j] >= b.x) && (p.bulletX[j] <= b.x + UNIT_SIZE - 1))
@@ -224,7 +252,28 @@ public class GamePanel extends JPanel implements ActionListener {
 				}
 			}
 		}
+		// check for powerups collision
+		for (int i = 0; i < powerups.size(); i++) {
+			PowerUps powerup = powerups.get(i);
+			if (p.getBoundingBox().intersects(powerup.getBoundingBox())) {
+				// TODO: logic for when player collides with powerup
+				powerups.remove(powerup);
+				if (powerup.getType() == "shield") {
+					p.setHasShield(true);
+				} else if (powerup.getType() == "laser"){
+					
+				} else if (powerup.getType() == "multishot"){
+					
+				}
+			}
+		}
 		// lagay so ng collision ng player to player
+		for (int i = 1; i < powerups.size(); i++) {
+			Player bot = players.get(i);
+			if (p.getBoundingBox().intersects(bot.getBoundingBox())) {
+				// TODO: Collision detected player and bot
+			}
+		}
 	}
 
 	public void fireBullets() {
@@ -337,6 +386,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		if (running) {
 			move();
 			botMove();
+//			spawnPowerups();
 			checkCollisions();
 			botBullets();
 			moveBullets();
