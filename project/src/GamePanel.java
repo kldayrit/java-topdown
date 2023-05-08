@@ -183,15 +183,6 @@ public class GamePanel extends JPanel implements ActionListener {
 					break;
 				}
 			}
-//			if(p.alive == false){
-//				p.respawn-=1;
-//				// respawn
-//				if (p.respawn == 0){
-//					p.alive = true;
-//					p.x = SCREEN_WIDTH/2;
-//					p.y = SCREEN_HEIGHT/2;
-//				}
-//			}
 		}
 	}
 
@@ -466,6 +457,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if (commandNum == 0) { // play again, reset settings
+						score = 0;
 						players.clear();
 						timer.stop();
 						powerupTimer.stop();
