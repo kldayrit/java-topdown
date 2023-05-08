@@ -19,7 +19,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	static final int DELAY = 120;
 
 	boolean running = false;
-
 	int score = 0;
 
 	String[] mColors = { "images/tile_0084.png", // p1
@@ -33,6 +32,9 @@ public class GamePanel extends JPanel implements ActionListener {
 	};
 
 	Timer timer;
+	GameTimer gameTime;
+	JLabel timerLabel, scoreLabel;
+	int timeRemaining;
 
 	int speed = 2;
 
@@ -48,7 +50,10 @@ public class GamePanel extends JPanel implements ActionListener {
 		this.setBackground(Color.black);
 		this.setFocusable(true);
 		this.addKeyListener(new MyKeyAdapter());
-
+		this.timerLabel = new JLabel("Time: ");
+		add(timerLabel);
+		this.scoreLabel = new JLabel("Score: ");
+		add(scoreLabel);
 		this.players = new ArrayList<Player>();
 		this.players.add(new Player(0, 0, 'R', "images/tile_0084.png"));
 		this.players.add(new Player(SCREEN_WIDTH - UNIT_SIZE, 0, 'D', "images/tile_0085.png"));
@@ -60,6 +65,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void startGame() {
 		running = true;
+		gameTime = new GameTimer(60);
 		timer = new Timer(DELAY, this);
 		timer.start();
 	}
@@ -70,6 +76,10 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void draw(Graphics g) {
+		if (gameTime.getTimeRemaining() == 0) {
+			running = false;
+		}
+
 		if (running) {
 			// paint background image
 			try {
@@ -109,11 +119,9 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 
 			// draw score
-			g.setColor(Color.MAGENTA);
-			g.setFont(new Font("Arial", Font.BOLD, 25));
-			FontMetrics metrics = getFontMetrics(g.getFont());
-			g.drawString("SCORE: " + score, (SCREEN_WIDTH - metrics.stringWidth("GAME OVER")) / 2, 100);
-
+			scoreLabel.setText("Score: " + score);
+			timeRemaining = gameTime.getTimeRemaining();
+			timerLabel.setText("Time: " + timeRemaining);
 		} else {
 			gameOver(g);
 		}
@@ -184,7 +192,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			if (p.x == SCREEN_WIDTH) {
 				p.x = SCREEN_WIDTH - UNIT_SIZE;
 			}
-			// top border
+			// top bordera
 			if (p.y < 0) {
 				p.y = 0;
 			}
@@ -202,19 +210,21 @@ public class GamePanel extends JPanel implements ActionListener {
 				// if tumama bullet ng kalaban sa player
 				if (((b.bulletX[j] >= p.x) && (b.bulletX[j] <= p.x + UNIT_SIZE - 1))
 						&& ((b.bulletY[j] >= p.y) && (b.bulletY[j] <= p.y + UNIT_SIZE - 1)) && b.alive) {
-					running = false;
+					p.alive = false;
+					// add delay
+					p.respawn(0, 0);
 				}
 				// if tumama bullet ng player sa kalaban
 				if (((p.bulletX[j] >= b.x) && (p.bulletX[j] <= b.x + UNIT_SIZE - 1))
 						&& ((p.bulletY[j] >= b.y) && (p.bulletY[j] <= b.y + UNIT_SIZE - 1)) && b.alive) {
 					b.alive = false;
 					score++;
-//					b.respawn = 10;
+					// add delay
+					b.respawn(SCREEN_WIDTH, SCREEN_HEIGHT);
 				}
 			}
 		}
 		// lagay so ng collision ng player to player
-
 	}
 
 	public void fireBullets() {

@@ -6,19 +6,24 @@ import javax.imageio.*;
 
 public class Player {
 	int x;
-    int y;
-    char direction;
-    BufferedImage image;
+	int y;
+	char direction;
+	BufferedImage image;
+	private int timeOfDeath;
+	private int score = 0;
+	private String bulletType = "normal";
+	private boolean hasShield = false;
 
-	static final int GAME_UNITS = (1200*600) / 25;
+	static final int GAME_UNITS = (1200 * 600) / 25;
 	static final int UNIT_SIZE = 30;
 
 	final int bulletX[] = new int[GAME_UNITS];
 	final int bulletY[] = new int[GAME_UNITS];
 	final char bulletDirection[] = new char[GAME_UNITS];
 
-	boolean alive= true;
-	public Player(int x, int y, char dir, String imagePath){
+	boolean alive = true;
+
+	public Player(int x, int y, char dir, String imagePath) {
 		this.x = x;
 		this.y = y;
 		this.direction = dir;
@@ -28,18 +33,62 @@ public class Player {
 		loadImage(imagePath);
 	}
 
-	 public void draw(Graphics g) {
-		 g.drawImage(image,this.x, this.y, UNIT_SIZE, UNIT_SIZE, null);
-	 }
-	 
-	 private void loadImage(String filename) {
-		 try {
-			 image = ImageIO.read(getClass().getResource(filename));
-		 } catch (IOException e) {
-			 e.printStackTrace();
-	     }
-	 }           
-	
+	public void draw(Graphics g) {
+		g.drawImage(image, this.x, this.y, UNIT_SIZE, UNIT_SIZE, null);
+	}
+
+	private void loadImage(String filename) {
+		try {
+			image = ImageIO.read(getClass().getResource(filename));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void respawn(int width, int height) {
+		// respawn dito muna
+		if (width != 0 && height != 0) {
+			this.x = width / 2;
+			this.y = height / 2;
+		} else {
+			this.x = width;
+			this.y = height;
+		}
+		this.alive = true;
+	}
+
+	public String getBulletType() {
+		return bulletType;
+	}
+
+	public void setBulletType(String bulletType) {
+		this.bulletType = bulletType;
+	}
+
+	public boolean getHasShield() {
+		return hasShield;
+	}
+
+	public void setHasShield(boolean hasShield) {
+		this.hasShield = hasShield;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public int getTimeOfDeath() {
+		return timeOfDeath;
+	}
+
+	public void setTimeOfDeath(int timeOfDeath) {
+		this.timeOfDeath = timeOfDeath;
+	}
+
 //	public int getX() {
 //    	return this.x;
 //	}
