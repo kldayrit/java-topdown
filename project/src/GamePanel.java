@@ -11,6 +11,26 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
+	
+	
+	int score = 0;
+	int speed = 2;
+	int timeRemaining;
+	int commandNum = 0;
+	String gameState = "IN GAME";
+	boolean running = false;
+	
+	Timer timer, powerupTimer;
+	JLabel timerLabel, scoreLabel;
+	JButton button;
+	GameTimer gameTime;
+
+	// pang 4 players
+	ArrayList<Player> players;
+	private List<PowerUps> powerups = new ArrayList<>();
+
+	BufferedImage background;
+	BufferedImage image;
 
 	static final int SCREEN_WIDTH = 1200;
 	static final int SCREEN_HEIGHT = 600;
@@ -19,8 +39,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
 	static final int DELAY = 90;
 
-	boolean running = false;
-	int score = 0;
 
 	String[] mColors = { "images/tile_0084.png", // p1
 			"images/tile_0085.png", // p2
@@ -32,19 +50,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			"#b7c0c7" // light gray
 	};
 
-	Timer timer, powerupTimer;
-	GameTimer gameTime;
-	JLabel timerLabel, scoreLabel;
-	int timeRemaining;
-
-	int speed = 2;
-
-	// pang 4 players
-	ArrayList<Player> players;
-	private List<PowerUps> powerups = new ArrayList<>();
-
-	BufferedImage background;
-	BufferedImage image;
 
 	GamePanel() {
 		this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -55,27 +60,29 @@ public class GamePanel extends JPanel implements ActionListener {
 		add(timerLabel);
 		this.scoreLabel = new JLabel("Score: ");
 		add(scoreLabel);
-
 		this.players = new ArrayList<Player>();
+		spawnPlayers();
+		startGame();
+	}
+	
+	public void spawnPlayers() {
 		this.players.add(new Player(0, 0, 'R', "images/tile_0084.png"));
 		this.players.add(new Player(SCREEN_WIDTH - UNIT_SIZE, 0, 'D', "images/tile_0085.png"));
 		this.players.add(new Player(SCREEN_WIDTH - UNIT_SIZE, SCREEN_HEIGHT - UNIT_SIZE, 'L', "images/tile_0086.png"));
 		this.players.add(new Player(0, SCREEN_HEIGHT - UNIT_SIZE, 'U', "images/tile_0087.png"));
-
-		startGame();
 	}
 
 	public void startGame() {
 		running = true;
-		gameTime = new GameTimer(60);
 		timer = new Timer(DELAY, this);
-		timer.start();
 
 		powerupTimer = new Timer(10000, e -> { // spawn powerups every 10 seconds
 			if (this.powerups.size() < 3) {
 				spawnPowerups();
 			}
 		});
+		timer.start();
+		gameTime = new GameTimer(3);
 		powerupTimer.start();
 	}
 
@@ -111,9 +118,8 @@ public class GamePanel extends JPanel implements ActionListener {
 //			}
 
 			// draw player
-			for (int i = 0; i < this.players.size(); i++) {
-				Player p = this.players.get(i);
-				p.draw(g);
+			for (Player player : players) {
+				player.draw(g);
 			}
 
 			// draw powerups
@@ -197,9 +203,11 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void spawnPowerups() {
 		Random rand = new Random();
+		// random location & type
 		int x = rand.nextInt(SCREEN_WIDTH - UNIT_SIZE) + UNIT_SIZE;
 		int y = rand.nextInt(SCREEN_HEIGHT - UNIT_SIZE) + UNIT_SIZE;
-		int type = rand.nextInt(3);
+		int type = rand.nextInt(2);
+		// TODO: fix bug where all powerup on screen change type
 		this.powerups.add(new PowerUps(x, y, type));
 		// TODO: add logic so powerups will not spawn on top of players and obstacles
 	}
@@ -233,11 +241,13 @@ public class GamePanel extends JPanel implements ActionListener {
 				// if tumama bullet ng kalaban sa player
 				if (((b.bulletX[j] >= p.x) && (b.bulletX[j] <= p.x + UNIT_SIZE - 1))
 						&& ((b.bulletY[j] >= p.y) && (b.bulletY[j] <= p.y + UNIT_SIZE - 1)) && b.alive) {
-					if(p.getHasShield() == true) {
+					if (p.getHasShield() == true) {
 						p.setHasShield(false); // remove shield if hit by enemy bullet
-					} else {						
+					} else {
 						p.alive = false;
-						score--;
+						if (score > 0) {
+							score--; // decrease score if player dies until 0
+						}
 						// add delay
 						p.respawn(0, 0);
 					}
@@ -260,19 +270,38 @@ public class GamePanel extends JPanel implements ActionListener {
 				powerups.remove(powerup);
 				if (powerup.getType() == "shield") {
 					p.setHasShield(true);
-				} else if (powerup.getType() == "laser"){
-					
-				} else if (powerup.getType() == "multishot"){
-					
+				} else if (powerup.getType() == "laser") {
+
+				} else if (powerup.getType() == "multishot") {
+
 				}
 			}
 		}
 		// lagay so ng collision ng player to player
-		for (int i = 1; i < powerups.size(); i++) {
+		for (int i = 1; i < players.size(); i++) {
 			Player bot = players.get(i);
 			if (p.getBoundingBox().intersects(bot.getBoundingBox())) {
 				// TODO: Collision detected player and bot
+				changePlayerDirection(p);
+				changePlayerDirection(bot);
 			}
+		}
+	}
+
+	public void changePlayerDirection(Player p) {
+		switch (p.direction) {
+		case 'U':
+			p.direction = 'R';
+			break;
+		case 'D':
+			p.direction = 'L';
+			break;
+		case 'L':
+			p.direction = 'U';
+			break;
+		case 'R':
+			p.direction = 'D';
+			break;
 		}
 	}
 
@@ -373,10 +402,28 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void gameOver(Graphics g) {
+		gameState = "GAME OVER";
+		
 		g.setColor(Color.MAGENTA);
 		g.setFont(new Font("Arial", Font.BOLD, 75));
 		FontMetrics metrics = getFontMetrics(g.getFont());
-		g.drawString("GAME OVER", (SCREEN_WIDTH - metrics.stringWidth("GAME OVER")) / 2, SCREEN_HEIGHT / 2);
+		g.drawString("GAME OVER", (SCREEN_WIDTH - metrics.stringWidth("GAME OVER")) / 2, (SCREEN_HEIGHT / 2)-50);
+		
+		g.setColor(Color.white);
+		g.setFont(new Font("Arial", Font.BOLD, 50));
+		metrics = getFontMetrics(g.getFont());
+		int x = (SCREEN_WIDTH - metrics.stringWidth("Play Again")) / 2;
+		int y = (SCREEN_HEIGHT / 2)+100;
+		g.drawString("Play Again", x, y);
+		if(commandNum == 0) {
+			g.drawString(">", x-40, y);
+		}
+		x = (SCREEN_WIDTH - metrics.stringWidth("Exit Game")) / 2;
+		y = (SCREEN_HEIGHT / 2)+200;
+		g.drawString("Exit Game", x, y);
+		if(commandNum == 1) {
+			g.drawString(">", x-40, y);
+		}
 	}
 
 	// dito yung parang per frame
@@ -386,7 +433,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		if (running) {
 			move();
 			botMove();
-//			spawnPowerups();
 			checkCollisions();
 			botBullets();
 			moveBullets();
@@ -398,30 +444,46 @@ public class GamePanel extends JPanel implements ActionListener {
 	public class MyKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
-			// kasi right key lang pwede
-			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-				Player p = players.get(0);
-				switch (p.direction) {
-				case 'U':
-					p.direction = 'R';
-					break;
-				case 'D':
-					p.direction = 'L';
-					break;
-				case 'L':
-					p.direction = 'U';
-					break;
-				case 'R':
-					p.direction = 'D';
-					break;
+			if (gameState == "IN GAME") { 	
+				// kasi right key lang pwede
+				if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+					Player p = players.get(0);
+					changePlayerDirection(p);
 				}
-			}
-
-			// dito yung bullet
-			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-				fireBullets();
+				
+				// dito yung bullet
+				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+					fireBullets();
+				}
+			} else if (gameState == "GAME OVER") { // for game over menu
+				if (e.getKeyCode() == KeyEvent.VK_UP) {
+					commandNum--;
+					if (commandNum < 0) {
+						commandNum = 1;
+					}
+				} 
+				
+				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+					commandNum++;
+					if (commandNum > 1) {
+						commandNum = 0;
+					}
+				}
+				
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (commandNum == 0) { // play again, reset settings
+						players.clear();
+						timer.stop();
+						powerupTimer.stop();
+						gameState = "IN GAME";
+						spawnPlayers();
+						startGame();
+					} else if (commandNum == 1) { // exit game
+						setVisible(false);
+						System.exit(0);
+					}
+				}
 			}
 		}
 	}
-
 }

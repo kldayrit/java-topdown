@@ -19,9 +19,9 @@ public class PowerUps {
 		this.xPos = xPos;
 		this.yPos = yPos;
 		// determines the type of power up that will spawn
-		if (n == 1) {
+		if (n == 0) {
 			this.setType(PowerUps.SHIELD_TYPE);
-		} else if (n == 0) {
+		} else if (n == 1) {
 			this.setType(PowerUps.LASER_TYPE);
 		} else if (n == 2) {
 			this.setType(PowerUps.MULTI_TYPE);
