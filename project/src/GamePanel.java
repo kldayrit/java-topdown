@@ -11,34 +11,29 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
-	
-	
 	int score = 0;
 	int speed = 2;
 	int timeRemaining;
 	int commandNum = 0;
 	String gameState = "IN GAME";
 	boolean running = false;
-	
+
 	Timer timer, powerupTimer;
 	JLabel timerLabel, scoreLabel;
 	JButton button;
 	GameTimer gameTime;
+	BufferedImage image;
+	BufferedImage background;
 
 	// pang 4 players
 	ArrayList<Player> players;
 	private List<PowerUps> powerups = new ArrayList<>();
 
-	BufferedImage background;
-	BufferedImage image;
-
 	static final int SCREEN_WIDTH = 1200;
 	static final int SCREEN_HEIGHT = 600;
-
 	static final int UNIT_SIZE = 50;
 	static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
 	static final int DELAY = 90;
-
 
 	String[] mColors = { "images/tile_0084.png", // p1
 			"images/tile_0085.png", // p2
@@ -49,7 +44,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			"#7d669e", // purple
 			"#b7c0c7" // light gray
 	};
-
 
 	GamePanel() {
 		this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -64,7 +58,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		spawnPlayers();
 		startGame();
 	}
-	
+
 	public void spawnPlayers() {
 		this.players.add(new Player(0, 0, 'R', "images/tile_0084.png"));
 		this.players.add(new Player(SCREEN_WIDTH - UNIT_SIZE, 0, 'D', "images/tile_0085.png"));
@@ -82,7 +76,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 		});
 		timer.start();
-		gameTime = new GameTimer(3);
+		gameTime = new GameTimer(60);
 		powerupTimer.start();
 	}
 
@@ -403,26 +397,26 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void gameOver(Graphics g) {
 		gameState = "GAME OVER";
-		
+
 		g.setColor(Color.MAGENTA);
 		g.setFont(new Font("Arial", Font.BOLD, 75));
 		FontMetrics metrics = getFontMetrics(g.getFont());
-		g.drawString("GAME OVER", (SCREEN_WIDTH - metrics.stringWidth("GAME OVER")) / 2, (SCREEN_HEIGHT / 2)-50);
-		
+		g.drawString("GAME OVER", (SCREEN_WIDTH - metrics.stringWidth("GAME OVER")) / 2, (SCREEN_HEIGHT / 2) - 50);
+
 		g.setColor(Color.white);
 		g.setFont(new Font("Arial", Font.BOLD, 50));
 		metrics = getFontMetrics(g.getFont());
 		int x = (SCREEN_WIDTH - metrics.stringWidth("Play Again")) / 2;
-		int y = (SCREEN_HEIGHT / 2)+100;
+		int y = (SCREEN_HEIGHT / 2) + 100;
 		g.drawString("Play Again", x, y);
-		if(commandNum == 0) {
-			g.drawString(">", x-40, y);
+		if (commandNum == 0) {
+			g.drawString(">", x - 40, y);
 		}
 		x = (SCREEN_WIDTH - metrics.stringWidth("Exit Game")) / 2;
-		y = (SCREEN_HEIGHT / 2)+200;
+		y = (SCREEN_HEIGHT / 2) + 200;
 		g.drawString("Exit Game", x, y);
-		if(commandNum == 1) {
-			g.drawString(">", x-40, y);
+		if (commandNum == 1) {
+			g.drawString(">", x - 40, y);
 		}
 	}
 
@@ -444,13 +438,13 @@ public class GamePanel extends JPanel implements ActionListener {
 	public class MyKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
-			if (gameState == "IN GAME") { 	
+			if (gameState == "IN GAME") {
 				// kasi right key lang pwede
 				if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 					Player p = players.get(0);
 					changePlayerDirection(p);
 				}
-				
+
 				// dito yung bullet
 				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 					fireBullets();
@@ -461,15 +455,15 @@ public class GamePanel extends JPanel implements ActionListener {
 					if (commandNum < 0) {
 						commandNum = 1;
 					}
-				} 
-				
+				}
+
 				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 					commandNum++;
 					if (commandNum > 1) {
 						commandNum = 0;
 					}
 				}
-				
+
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if (commandNum == 0) { // play again, reset settings
 						players.clear();
