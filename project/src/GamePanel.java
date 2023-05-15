@@ -160,7 +160,6 @@ public class GamePanel extends JPanel implements ActionListener {
 				break;
 			}
 		}
-
 	}
 
 	public void botMove() {
@@ -191,10 +190,10 @@ public class GamePanel extends JPanel implements ActionListener {
 		// random location & type
 		int x = rand.nextInt(SCREEN_WIDTH - UNIT_SIZE) + UNIT_SIZE;
 		int y = rand.nextInt(SCREEN_HEIGHT - UNIT_SIZE) + UNIT_SIZE;
-		int type = rand.nextInt(2);
-		// TODO: fix bug where all powerup on screen change type
-		this.powerups.add(new PowerUps(x, y, type));
 		// TODO: add logic so powerups will not spawn on top of players and obstacles
+//		int type = rand.nextInt(2);
+		// TODO: fix bug where all powerup on screen change type
+		this.powerups.add(new PowerUps(x, y, 0)); // shield nalang muna yung powerup
 	}
 
 	public void checkCollisions() {
@@ -383,13 +382,12 @@ public class GamePanel extends JPanel implements ActionListener {
 				}
 			}
 		}
-//
 	}
 
 	public void gameOver(Graphics g) {
 		gameState = "GAME OVER";
 
-		g.setColor(Color.MAGENTA);
+		g.setColor(Color.WHITE);
 		g.setFont(new Font("Arial", Font.BOLD, 75));
 		FontMetrics metrics = getFontMetrics(g.getFont());
 		g.drawString("GAME OVER", (SCREEN_WIDTH - metrics.stringWidth("GAME OVER")) / 2, (SCREEN_HEIGHT / 2) - 50);
@@ -429,10 +427,10 @@ public class GamePanel extends JPanel implements ActionListener {
 	public class MyKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
+			Player p = players.get(0);
 			if (gameState == "IN GAME") {
 				// kasi right key lang pwede
 				if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-					Player p = players.get(0);
 					changePlayerDirection(p);
 				}
 
@@ -440,6 +438,10 @@ public class GamePanel extends JPanel implements ActionListener {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 					fireBullets();
 				}
+
+				// TODO: show chat
+//				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+//				}
 			} else if (gameState == "GAME OVER") { // for game over menu
 				if (e.getKeyCode() == KeyEvent.VK_UP) {
 					commandNum--;
@@ -459,6 +461,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					if (commandNum == 0) { // play again, reset settings
 						score = 0;
 						players.clear();
+						powerups.clear();
 						timer.stop();
 						powerupTimer.stop();
 						gameState = "IN GAME";

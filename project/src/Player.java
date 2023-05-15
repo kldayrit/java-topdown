@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.awt.*;
 import java.io.*;
 import java.awt.geom.*;
@@ -10,6 +12,7 @@ public class Player {
 	int y;
 	char direction;
 	BufferedImage image;
+	boolean alive = true;
 	private int timeOfDeath;
 	private int score = 0;
 	private String bulletType = "normal";
@@ -17,12 +20,10 @@ public class Player {
 
 	static final int GAME_UNITS = (1200 * 600) / 25;
 	static final int UNIT_SIZE = 50;
-
+	
 	final int bulletX[] = new int[GAME_UNITS];
 	final int bulletY[] = new int[GAME_UNITS];
 	final char bulletDirection[] = new char[GAME_UNITS];
-
-	boolean alive = true;
 
 	public Player(int x, int y, char dir, String imagePath) {
 		this.x = x;
