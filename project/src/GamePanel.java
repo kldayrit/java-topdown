@@ -229,6 +229,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						p.setHasShield(false); // remove shield if hit by enemy bullet
 					} else {
 						p.alive = false;
+						p.setTimeOfDeath(timeRemaining);
 						if (score > 0) {
 							score--; // decrease score if player dies until 0
 						}
@@ -240,6 +241,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				if (((p.bulletX[j] >= b.x) && (p.bulletX[j] <= b.x + UNIT_SIZE - 1))
 						&& ((p.bulletY[j] >= b.y) && (p.bulletY[j] <= b.y + UNIT_SIZE - 1)) && b.alive) {
 					b.alive = false;
+					b.setTimeOfDeath(timeRemaining);
 					score++;
 					// add delay
 					b.respawn(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -419,7 +421,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			checkCollisions();
 			botBullets();
 			moveBullets();
-
 		}
 		repaint();
 	}
