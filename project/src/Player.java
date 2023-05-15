@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.awt.*;
 import java.io.*;
+import java.awt.geom.*;
 import java.awt.image.*;
 import javax.imageio.*;
 
@@ -34,6 +35,13 @@ public class Player {
 	}
 
 	public void draw(Graphics g) {
+		if (this.hasShield) {			
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setStroke(new BasicStroke(5.0f));
+			Ellipse2D circle = new Ellipse2D.Double(this.x-7, this.y-2, UNIT_SIZE+15, UNIT_SIZE+15);
+			g2d.setColor(Color.WHITE);
+			g2d.draw(circle);
+		}
 		g.drawImage(image, this.x, this.y, UNIT_SIZE, UNIT_SIZE, null);
 	}
 
