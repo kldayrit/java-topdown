@@ -1,0 +1,32 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.event.ActionListener; 
+//https://stackoverflow.com/questions/20546336/joptionpane-using-one-window-for-input-and-output
+public class Test extends JFrame {
+    JTextArea jta = new JTextArea(10, 30);
+    JTextField jtf = new JTextField(30);
+
+    public Test(){
+        add(jtf, BorderLayout.SOUTH);
+        add(jta, BorderLayout.CENTER);
+
+        jtf.addActionListener (new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+
+            }
+        });
+    }
+
+    public static void main(String[] args){
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                JFrame frame = new Test();
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setLocationRelativeTo(null);
+                frame.pack();
+                frame.setVisible(true);
+            }
+        });
+    }
+}
