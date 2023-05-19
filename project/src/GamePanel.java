@@ -15,7 +15,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int speed = 2;
 	int timeRemaining;
 	int commandNum = 0;
-	String gameState = "IN GAME";
+	String gameState = "PRE GAME";
 	boolean running = false;
 
 	Timer timer, powerupTimer;
@@ -50,13 +50,12 @@ public class GamePanel extends JPanel implements ActionListener {
 		this.setBackground(Color.black);
 		this.setFocusable(true);
 		this.addKeyListener(new MyKeyAdapter());
-		this.timerLabel = new JLabel("Time: ");
-		add(timerLabel);
-		this.scoreLabel = new JLabel("Score: ");
-		add(scoreLabel);
 		this.players = new ArrayList<Player>();
 		spawnPlayers();
-		startGame();
+		timer = new Timer(DELAY, this);
+		timer.start();
+		running = true;
+//		startGame();
 	}
 
 	public void spawnPlayers() {
@@ -67,17 +66,21 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void startGame() {
-		running = true;
-		timer = new Timer(DELAY, this);
+		gameState = "IN GAME";
 
 		powerupTimer = new Timer(10000, e -> { // spawn powerups every 10 seconds
 			if (this.powerups.size() < 3) {
 				spawnPowerups();
 			}
 		});
-		timer.start();
+
 		gameTime = new GameTimer(60);
 		powerupTimer.start();
+
+		this.timerLabel = new JLabel("Time: ");
+		add(timerLabel);
+		this.scoreLabel = new JLabel("Score: ");
+		add(scoreLabel);
 	}
 
 	public void paintComponent(Graphics g) {
@@ -85,11 +88,15 @@ public class GamePanel extends JPanel implements ActionListener {
 		draw(g);
 	}
 
-	public void draw(Graphics g) {
-		if (gameTime.getTimeRemaining() == 0) {
-			running = false;
+	public void checkTime() {
+		if (gameState == "IN GAME") {
+			if (gameTime.getTimeRemaining() == 0) {
+				running = false;
+			}
 		}
+	}
 
+	public void draw(Graphics g) {
 		if (running) {
 			// paint background image
 			try {
@@ -102,14 +109,6 @@ public class GamePanel extends JPanel implements ActionListener {
 					g.drawImage(background, i, j, UNIT_SIZE, UNIT_SIZE, null);
 				}
 			}
-
-//			// grids para lang makita
-//			for (int i = 0; i < SCREEN_WIDTH / UNIT_SIZE; i++) {
-//				g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT); // vertical
-//			}
-//			for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
-//				g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE); // horizontal
-//			}
 
 			// draw player
 			for (Player player : players) {
@@ -131,11 +130,16 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				}
 			}
-
-			// draw score
-			scoreLabel.setText("Score: " + score);
-			timeRemaining = gameTime.getTimeRemaining();
-			timerLabel.setText("Time: " + timeRemaining);
+			
+			if (gameState == "IN GAME") {
+				// draw score
+				scoreLabel.setText("Score: " + score);
+				timeRemaining = gameTime.getTimeRemaining();
+				timerLabel.setText("Time: " + timeRemaining);
+			} else if (gameState == "PRE GAME") {
+				// add overlay to the game
+				gameStart(g);
+			}
 		} else {
 			gameOver(g);
 		}
@@ -411,11 +415,35 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 
+	public void gameStart(Graphics g) {
+		g.setColor(Color.BLUE);
+		g.setFont(new Font("Arial", Font.BOLD, 75));
+		FontMetrics metrics = getFontMetrics(g.getFont());
+		g.drawString("4TH IMPACT", (SCREEN_WIDTH - metrics.stringWidth("GAME OVER")) / 2, (SCREEN_HEIGHT / 2) - 50);
+
+		g.setColor(Color.white);
+		g.setFont(new Font("Arial", Font.BOLD, 50));
+		metrics = getFontMetrics(g.getFont());
+		int x = (SCREEN_WIDTH - metrics.stringWidth("Play Again")) / 2;
+		int y = (SCREEN_HEIGHT / 2) + 100;
+		g.drawString("Start Game", x, y);
+		if (commandNum == 0) {
+			g.drawString(">", x - 40, y);
+		}
+		x = (SCREEN_WIDTH - metrics.stringWidth("Exit Game")) / 2;
+		y = (SCREEN_HEIGHT / 2) + 200;
+		g.drawString("Exit Game", x, y);
+		if (commandNum == 1) {
+			g.drawString(">", x - 40, y);
+		}
+	}
+
 	// dito yung parang per frame
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
-		if (running) {
+		if (running && gameState == "IN GAME") {
+			checkTime();
 			move();
 			botMove();
 			checkCollisions();
@@ -443,6 +471,29 @@ public class GamePanel extends JPanel implements ActionListener {
 				// TODO: show chat
 //				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 //				}
+			} else if (gameState == "PRE GAME") {
+				if (e.getKeyCode() == KeyEvent.VK_UP) {
+					commandNum--;
+					if (commandNum < 0) {
+						commandNum = 1;
+					}
+				}
+
+				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+					commandNum++;
+					if (commandNum > 1) {
+						commandNum = 0;
+					}
+				}
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (commandNum == 0) { // play again, reset settings
+						gameState = "IN GAME";
+						startGame();
+					} else if (commandNum == 1) { // exit game
+						setVisible(false);
+						System.exit(0);
+					}
+				}
 			} else if (gameState == "GAME OVER") { // for game over menu
 				if (e.getKeyCode() == KeyEvent.VK_UP) {
 					commandNum--;
