@@ -48,7 +48,7 @@ public class GameServer {
 				out.writeInt(numPlayers);
 				System.out.println("Player #" + numPlayers + " has connected.");
 
-				if (numPlayers == 2) {
+				if (numPlayers == 4) {
 					System.out.println("Starting game!");
 				}
 			}

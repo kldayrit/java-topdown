@@ -17,7 +17,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int commandNum = 0;
 	int countdownSeconds = 4;
 	String gameState = "PRE GAME";
-	String gameInstance = "SINGLE";
+	String gameInstance = "SINGLE"; // single player or multiplayer
 	boolean hasPromptedUser = false;
 	boolean isServer = false;
 	boolean running = false;
@@ -481,8 +481,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				g.setColor(Color.BLUE);
 				g.setFont(new Font("Arial", Font.BOLD, 75));
 				FontMetrics metrics = getFontMetrics(g.getFont());
-				g.drawString("Joining...", (SCREEN_WIDTH - metrics.stringWidth("Joining...")) / 2,
-						(SCREEN_HEIGHT / 2));
+				g.drawString("Joining...", (SCREEN_WIDTH - metrics.stringWidth("Joining...")) / 2, (SCREEN_HEIGHT / 2));
 			}
 		}
 	}
