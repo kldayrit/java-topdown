@@ -15,11 +15,13 @@ public class GamePanel extends JPanel implements ActionListener {
 	int speed = 2;
 	int timeRemaining;
 	int commandNum = 0;
+	int countdownSeconds = 4;
 	String gameState = "PRE GAME";
+	String gameInstance = "SINGLE";
 	boolean running = false;
 
 	Timer timer, powerupTimer;
-	JLabel timerLabel, scoreLabel;
+	JLabel timerLabel, scoreLabel, countdownLabel;
 	JButton button;
 	GameTimer gameTime;
 	BufferedImage image;
@@ -130,7 +132,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				}
 			}
-			
+
 			if (gameState == "IN GAME") {
 				// draw score
 				scoreLabel.setText("Score: " + score);
@@ -139,6 +141,8 @@ public class GamePanel extends JPanel implements ActionListener {
 			} else if (gameState == "PRE GAME") {
 				// add overlay to the game
 				gameStart(g);
+			} else if (gameState == "LOBBY") {
+				lobby(g);
 			}
 		} else {
 			gameOver(g);
@@ -424,18 +428,56 @@ public class GamePanel extends JPanel implements ActionListener {
 		g.setColor(Color.white);
 		g.setFont(new Font("Arial", Font.BOLD, 50));
 		metrics = getFontMetrics(g.getFont());
-		int x = (SCREEN_WIDTH - metrics.stringWidth("Play Again")) / 2;
-		int y = (SCREEN_HEIGHT / 2) + 100;
-		g.drawString("Start Game", x, y);
+		int x = (SCREEN_WIDTH - metrics.stringWidth("Single Player")) / 2;
+		int y = (SCREEN_HEIGHT / 2) + 50;
+		g.drawString("Single Player", x, y);
 		if (commandNum == 0) {
 			g.drawString(">", x - 40, y);
 		}
-		x = (SCREEN_WIDTH - metrics.stringWidth("Exit Game")) / 2;
-		y = (SCREEN_HEIGHT / 2) + 200;
-		g.drawString("Exit Game", x, y);
+		x = (SCREEN_WIDTH - metrics.stringWidth("MultiPlayer")) / 2;
+		y = (SCREEN_HEIGHT / 2) + 100;
+		g.drawString("Multiplayer", x, y);
 		if (commandNum == 1) {
 			g.drawString(">", x - 40, y);
 		}
+		x = (SCREEN_WIDTH - metrics.stringWidth("Exit Game")) / 2;
+		y = (SCREEN_HEIGHT / 2) + 150;
+		g.drawString("Exit Game", x, y);
+		if (commandNum == 2) {
+			g.drawString(">", x - 40, y);
+		}
+	}
+	
+	public void countdown() {
+		gameState = "COUNTDOWN";
+		countdownLabel = new JLabel(Integer.toString(countdownSeconds));
+		countdownLabel.setFont(new Font("Arial", Font.BOLD, 100));
+		countdownLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		countdownLabel.setForeground(Color.BLUE);
+		add(countdownLabel);
+	}
+	
+	public void startCountdown() {
+		Timer timer = new Timer(1000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				countdownSeconds--;
+				countdownLabel.setText(Integer.toString(countdownSeconds));
+
+				if (countdownSeconds <= 0) {
+					((Timer) e.getSource()).stop();
+					remove(countdownLabel);
+                    startGame();
+				}
+			}
+		});
+
+		timer.setInitialDelay(0);
+		timer.start();
+	}
+
+	public void lobby(Graphics g) {
+
 	}
 
 	// dito yung parang per frame
@@ -481,7 +523,33 @@ public class GamePanel extends JPanel implements ActionListener {
 
 				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 					commandNum++;
-					if (commandNum > 1) {
+					if (commandNum > 2) {
+						commandNum = 0;
+					}
+				}
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (commandNum == 0) { // play again, reset settings
+						countdown();
+						startCountdown();
+					} else if (commandNum == 1) {
+						gameState = "LOBBY";
+						commandNum = 0;
+					} else if (commandNum == 1) { // exit game
+						setVisible(false);
+						System.exit(0);
+					}
+				}
+			} else if (gameState == "LOBBY") {
+				if (e.getKeyCode() == KeyEvent.VK_UP) {
+					commandNum--;
+					if (commandNum < 0) {
+						commandNum = 1;
+					}
+				}
+
+				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+					commandNum++;
+					if (commandNum > 2) {
 						commandNum = 0;
 					}
 				}
@@ -489,6 +557,8 @@ public class GamePanel extends JPanel implements ActionListener {
 					if (commandNum == 0) { // play again, reset settings
 						gameState = "IN GAME";
 						startGame();
+					} else if (commandNum == 1) { //
+						gameState = "LOBBY";
 					} else if (commandNum == 1) { // exit game
 						setVisible(false);
 						System.exit(0);
