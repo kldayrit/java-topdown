@@ -18,6 +18,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	int countdownSeconds = 4;
 	String gameState = "PRE GAME";
 	String gameInstance = "SINGLE";
+	boolean hasPromptedUser = false;
+	boolean isServer = false;
 	boolean running = false;
 
 	Timer timer, powerupTimer;
@@ -447,7 +449,44 @@ public class GamePanel extends JPanel implements ActionListener {
 			g.drawString(">", x - 40, y);
 		}
 	}
-	
+
+	public void lobby(Graphics g) {
+		if (!hasPromptedUser) {
+			FontMetrics metrics = getFontMetrics(g.getFont());
+			g.setColor(Color.white);
+			g.setFont(new Font("Arial", Font.BOLD, 50));
+			metrics = getFontMetrics(g.getFont());
+			int x = (SCREEN_WIDTH - metrics.stringWidth("Create Game")) / 2;
+			int y = (SCREEN_HEIGHT / 2) - 50;
+			g.drawString("Create Game", x, y);
+			if (commandNum == 0) {
+				g.drawString(">", x - 40, y);
+			}
+			x = (SCREEN_WIDTH - metrics.stringWidth("Join Game")) / 2;
+			y = (SCREEN_HEIGHT / 2) + 50;
+			g.drawString("Join Game", x, y);
+			if (commandNum == 1) {
+				g.drawString(">", x - 40, y);
+			}
+		} else {
+			if (isServer) {
+				g.setColor(Color.BLUE);
+				g.setFont(new Font("Arial", Font.BOLD, 75));
+				FontMetrics metrics = getFontMetrics(g.getFont());
+				g.drawString("Waiting for players to join...",
+						(SCREEN_WIDTH - metrics.stringWidth("Waiting for players to join...")) / 2,
+						(SCREEN_HEIGHT / 2));
+				// display server's ip or code for clients to join
+			} else {
+				g.setColor(Color.BLUE);
+				g.setFont(new Font("Arial", Font.BOLD, 75));
+				FontMetrics metrics = getFontMetrics(g.getFont());
+				g.drawString("Joining...", (SCREEN_WIDTH - metrics.stringWidth("Joining...")) / 2,
+						(SCREEN_HEIGHT / 2));
+			}
+		}
+	}
+
 	public void countdown() {
 		gameState = "COUNTDOWN";
 		countdownLabel = new JLabel(Integer.toString(countdownSeconds));
@@ -456,7 +495,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		countdownLabel.setForeground(Color.BLUE);
 		add(countdownLabel);
 	}
-	
+
 	public void startCountdown() {
 		Timer timer = new Timer(1000, new ActionListener() {
 			@Override
@@ -467,17 +506,13 @@ public class GamePanel extends JPanel implements ActionListener {
 				if (countdownSeconds <= 0) {
 					((Timer) e.getSource()).stop();
 					remove(countdownLabel);
-                    startGame();
+					startGame();
 				}
 			}
 		});
 
 		timer.setInitialDelay(0);
 		timer.start();
-	}
-
-	public void lobby(Graphics g) {
-
 	}
 
 	// dito yung parang per frame
@@ -520,7 +555,6 @@ public class GamePanel extends JPanel implements ActionListener {
 						commandNum = 1;
 					}
 				}
-
 				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 					commandNum++;
 					if (commandNum > 2) {
@@ -534,7 +568,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					} else if (commandNum == 1) {
 						gameState = "LOBBY";
 						commandNum = 0;
-					} else if (commandNum == 1) { // exit game
+					} else if (commandNum == 2) { // exit game
 						setVisible(false);
 						System.exit(0);
 					}
@@ -546,22 +580,20 @@ public class GamePanel extends JPanel implements ActionListener {
 						commandNum = 1;
 					}
 				}
-
 				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 					commandNum++;
-					if (commandNum > 2) {
+					if (commandNum > 1) {
 						commandNum = 0;
 					}
 				}
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					hasPromptedUser = true;
 					if (commandNum == 0) { // play again, reset settings
-						gameState = "IN GAME";
-						startGame();
+						isServer = true;
+						// call server function here
 					} else if (commandNum == 1) { //
-						gameState = "LOBBY";
-					} else if (commandNum == 1) { // exit game
-						setVisible(false);
-						System.exit(0);
+						isServer = false;
+						// call client function here
 					}
 				}
 			} else if (gameState == "GAME OVER") { // for game over menu
