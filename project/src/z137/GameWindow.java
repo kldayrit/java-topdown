@@ -11,11 +11,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Iterator;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,7 +34,8 @@ public class GameWindow extends JPanel implements ActionListener {
 	GameState state;
 
 	public List<Player> players;
-
+    BufferedImage pImage;
+	BufferedImage bImage;
 	int myID;
 
 	private volatile boolean connecting;
@@ -50,7 +53,13 @@ public class GameWindow extends JPanel implements ActionListener {
 		setPreferredSize(new Dimension(600, 600));
 		timer = new Timer(DELAY, this);
 		timer.start();
-
+        try {
+			pImage = ImageIO.read(getClass().getResource("/images/player.png"));
+			bImage = ImageIO.read(getClass().getResource("/images/shot.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		};
 		Thread connector = new Thread(() -> connect(hostName, serverPortNumber));
 		connector.start();
 	} // end constructor
@@ -102,6 +111,9 @@ public class GameWindow extends JPanel implements ActionListener {
 				myID = id - 1;
 				repaint();
 				// start gui
+                ChatBox chatBox = new ChatBox(myID);
+	        	chatBox.setVisible(true);
+
 			});
 		} catch (Exception e) {
 			SwingUtilities.invokeLater(() -> {
@@ -212,8 +224,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	private void drawObjects(Graphics g) {
 		for (Player pl : players) {
 			if (pl.isVisible()) {
-				g.setColor(Color.CYAN);
-				g.fillOval(pl.x, pl.y, 20, 20);
+				g.drawImage(pImage,pl.x, pl.y, 20, 20, null);
 				g.setColor(Color.WHITE);
 				g.drawString(Integer.toString(players.indexOf(pl)), pl.getX(), pl.getY());
 //                pl.draw(g);
@@ -222,8 +233,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
 			for (Missile missile : ms) {
 				if (missile.isVisible()) {
-					g.setColor(Color.YELLOW);
-					g.fillOval(missile.x, missile.y, 10, 10);
+					g.drawImage(bImage,missile.x, missile.y, bImage.getHeight(), bImage.getWidth(), null);
 				}
 			}
 		}
