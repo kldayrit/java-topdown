@@ -35,10 +35,11 @@ import java.io.Serializable;
 public class GameWindow extends JPanel implements ActionListener {
 
 	GameState state;
-
+	public List<Wall> walls; // List to hold wall objects
 	public List<Player> players;
     BufferedImage pImage;
 	BufferedImage bImage;
+	BufferedImage wallImage; // Added variable for wall image
 	Rectangle windowBounds;
 	int myID;
 	int winner;
@@ -52,6 +53,8 @@ public class GameWindow extends JPanel implements ActionListener {
 	public GameWindow(String hostName, int serverPortNumber, JFrame f) {
 		// gui stuff
 		players = new ArrayList<>();
+		// Initialize the list of walls
+		walls = new ArrayList<>();
 		addKeyListener(new TAdapter());
 		setFocusable(true);
 		setBackground(Color.BLACK);
@@ -62,10 +65,12 @@ public class GameWindow extends JPanel implements ActionListener {
         try {
 			pImage = ImageIO.read(getClass().getResource("/images/player.png"));
 			bImage = ImageIO.read(getClass().getResource("/images/shot.png"));
+			wallImage = ImageIO.read(getClass().getResource("/images/wall.png")); // Load the wall image
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		};
+		createWalls(); // Create the walls
 		Thread connector = new Thread(() -> connect(hostName, serverPortNumber));
 		connector.start();
 	} // end constructor
@@ -135,6 +140,27 @@ public class GameWindow extends JPanel implements ActionListener {
 		this.state = state;
 		players = state.players;
 		//
+	}
+	
+	private void createWalls() {
+		// Create and add wall objects to the list
+		int numWalls = 5;
+		int wallWidth = 2;
+		int wallHeight = 5;
+		int boardWidth = getWidth();
+		int boardHeight = getHeight();
+
+		int unitSize = Math.min(boardWidth / (wallWidth * numWalls), boardHeight / wallHeight);
+
+		int startX = (boardWidth - unitSize * wallWidth * numWalls) / 2; // Starting x-coordinate for the walls
+		int startY = (boardHeight - unitSize * wallHeight) / 2; // Starting y-coordinate for the walls
+
+		for (int i = 0; i < numWalls; i++) {
+			int x = startX + i * unitSize * wallWidth;
+			int y = startY;
+			Wall wall = new Wall(x, y, wallWidth, wallHeight, wallImage);
+			walls.add(wall);
+		}
 	}
 
 	@Override
@@ -250,6 +276,10 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	private void drawObjects(Graphics g) {
+		for (Wall wall : walls) {
+				wall.draw(g);
+			}
+			
 		for (Player pl : players) {
 			if (pl.isVisible()) {
 				g.drawImage(pImage,pl.x, pl.y, 20, 20, null);
