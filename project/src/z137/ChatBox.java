@@ -1,6 +1,9 @@
+package z137;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Toolkit;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -21,6 +24,8 @@ public class ChatBox extends JFrame {
     private MulticastSocket socket;
     private InetAddress group;
     private int port;
+    private int chatWidth = 500;
+    private int chatHeight = 350;
 
     public ChatBox() {
         initGUI();
@@ -29,8 +34,14 @@ public class ChatBox extends JFrame {
 
     private void initGUI() {
         setTitle("Chat");
-        setSize(500, 400);
-        setLocationRelativeTo(null);
+        setSize(chatWidth, chatHeight);
+        // calculate bottom right corner position
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int screenWidth = screenSize.width;
+        int screenHeight = screenSize.height;
+        int chatX = screenWidth - chatWidth; // X-coordinate for bottom right corner
+        int chatY = screenHeight - chatHeight; // Y-coordinate for bottom right corner
+        setBounds(chatX, chatY, chatWidth, chatHeight);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         chatTextArea = new JTextArea();
