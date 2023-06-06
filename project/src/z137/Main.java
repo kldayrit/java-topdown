@@ -16,6 +16,7 @@ public class Main  extends JFrame implements ActionListener {
 
 	private JButton button1;
 	private JButton button2;
+	private JButton button3;
 	private JLabel label;
 
     public Main(){
@@ -31,6 +32,10 @@ public class Main  extends JFrame implements ActionListener {
 	    button2.setBounds(200,150,95,30);
 	    this.button2.addActionListener(this);
 	    add(button2);
+	    button3=new JButton("Solo");
+	    button3.setBounds(140,200,95,30);
+	    this.button3.addActionListener(this);
+	    add(button3);
 	    setSize(400,400);
 	    setLayout(null);
 	    setVisible(true);
@@ -73,6 +78,10 @@ public class Main  extends JFrame implements ActionListener {
 	                return;
 	            }
 	            f.add(new GameWindow(host, port, f));
+//
+	        }
+	        if(e.getSource() == button3){
+	            f.add(new Board());
 //
 	        }
 	        f.setResizable(false);

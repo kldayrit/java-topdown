@@ -61,9 +61,37 @@ public class Player extends Sprite {
 	public List<Missile> getMissiles() {
 		return missiles;
 	}
-	
+
 	public void decrementHealth() {
 		this.setHealth(this.getHealth() - 1);
+	}
+
+	public void changeDirection(){
+		if (this.dx == 1 && this.dy == 0) {
+			this.dx = 1;
+			this.dy = 1;
+		} else if (this.dx == 1 && this.dy == 1) {
+			this.dx = 0;
+			this.dy = 1;
+		} else if (this.dx == 0 && this.dy == 1) {
+			this.dx = -1;
+			this.dy = 1;
+		} else if (this.dx == -1 && this.dy == 1) {
+			this.dx = -1;
+			this.dy = 0;
+		} else if (this.dx == -1 && this.dy == 0) {
+			this.dx = -1;
+			this.dy = -1;
+		} else if (this.dx == -1 && this.dy == -1) {
+			this.dx = 0;
+			this.dy = -1;
+		} else if (this.dx == 0 && this.dy == -1) {
+			this.dx = 1;
+			this.dy = -1;
+		} else if (this.dx == 1 && this.dy == -1) {
+			this.dx = 1;
+			this.dy = 0;
+		}
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -71,41 +99,17 @@ public class Player extends Sprite {
 		int key = e.getKeyCode();
 
 		if (key == KeyEvent.VK_SPACE) {
-			if(missiles.size() < 4) {				
+			if(missiles.size() < 4) {
 				fire();
 			}
 		}
 
 		if (key == KeyEvent.VK_RIGHT) {
-			if (this.dx == 1 && this.dy == 0) {
-				this.dx = 1;
-				this.dy = 1;
-			} else if (this.dx == 1 && this.dy == 1) {
-				this.dx = 0;
-				this.dy = 1;
-			} else if (this.dx == 0 && this.dy == 1) {
-				this.dx = -1;
-				this.dy = 1;
-			} else if (this.dx == -1 && this.dy == 1) {
-				this.dx = -1;
-				this.dy = 0;
-			} else if (this.dx == -1 && this.dy == 0) {
-				this.dx = -1;
-				this.dy = -1;
-			} else if (this.dx == -1 && this.dy == -1) {
-				this.dx = 0;
-				this.dy = -1;
-			} else if (this.dx == 0 && this.dy == -1) {
-				this.dx = 1;
-				this.dy = -1;
-			} else if (this.dx == 1 && this.dy == -1) {
-				this.dx = 1;
-				this.dy = 0;
-			}
+			changeDirection();
 		}
 
 	}
-	
+
 	public Rectangle getBounds() {
 		return new Rectangle(x, y, 20, 20);
 	}

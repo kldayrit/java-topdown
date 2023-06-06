@@ -299,7 +299,6 @@ public class GameWindow extends JPanel implements ActionListener {
 		public void keyPressed(KeyEvent e) {
 			players.get(myID).keyPressed(e);
 			connection.send(players);
-			System.out.println(Arrays.toString(players.get(myID).getMissiles().toArray()));
 		}
 	}
 }
