@@ -24,7 +24,7 @@ public class Main  extends JFrame implements ActionListener {
 	    setSize(400,400);
 	    setLayout(null);
 	    setVisible(true);
-        setTitle("Please Gumana ka");
+        setTitle("4TH IMPACT");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -69,8 +69,7 @@ public class Main  extends JFrame implements ActionListener {
             f.setVisible(true);
             f.pack();
             f.setAlwaysOnTop(true);
-            setTitle("Please Gumana ka");
-            setLocationRelativeTo(null);
+            setTitle("4TH IMPACT");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             this.setVisible(false);

@@ -1,5 +1,6 @@
 package z137;
 
+import java.awt.Rectangle;
 
 public class Missile extends Sprite {
 
@@ -12,11 +13,11 @@ public class Missile extends Sprite {
         super(x, y);
         this.dx = dx;
         this.dy = dy;
-        initMissile();
+//        initMissile();
     }
 
     private void initMissile() {
-        loadImage("./images/shot.png");
+        loadImage("/images/shot.png");
         getImageDimensions();
     }
 
@@ -28,4 +29,8 @@ public class Missile extends Sprite {
         if (x > BOARD_WIDTH)
             visible = false;
     }
+    
+    public Rectangle getBounds() {
+		return new Rectangle(x, y, 20, 20);
+	}
 }
