@@ -25,6 +25,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 import common.Client;
 
 import java.io.IOException;
@@ -204,17 +206,17 @@ public class GameWindow extends JPanel implements ActionListener {
             Iterator<Missile> projectileIterator =ms.iterator();
             while (projectileIterator.hasNext()) {
                 Missile projectile = projectileIterator.next();
-                if (!projectile.getBounds().intersects(windowBounds)) {
+                if (projectile.visible) {
 	                // Check collision with other sprites
 	                for (Player otherSprite : players) {
 	                    // Skip checking collision with itself
 	                    if (otherSprite == pl) {
 	                        continue;
 	                    }
-	                    
+
 	                    // Check if the projectile intersects with the bounds of the other sprite
 	                    if (projectile.getBounds().intersects(otherSprite.getBounds())) {
-	                        otherSprite.decrementHealth();                        	
+	                        otherSprite.decrementHealth();
 	                        if(otherSprite.getHealth() == 0) {
 	                        	otherSprite.setVisible(false);  // Set isVisible to false for the hit sprite with health = 0
 	                        }
@@ -222,24 +224,25 @@ public class GameWindow extends JPanel implements ActionListener {
 	                        break;                          // Break the loop since a collision occurred
 	                    }
 	                }
-                } else {
-                    // Projectile hit the window boundaries, remove it from the sprite's list
-                    projectileIterator.remove();
+	                if (projectile.x >= 600 || projectile.y >= 600 || projectile.x <= 0 || projectile.y <= 0) {
+	                    // Projectile hit the window boundaries, remove it from the sprite's list
+	                    projectileIterator.remove();
+	                }
                 }
             }
         }
     }
-	
+
 	public void checkWinCondition() {
 		int count = 0;
-	    
+
 	    for (Player pl : players) {
 	        if (pl.isVisible()) {
 	            count++;
 	            winner = players.indexOf(pl);
 	        }
 	    }
-	    
+
 	    if(count == 1) {
 	    	state.ingame = false;
 //	    	connection.send(state.ingame);
@@ -254,12 +257,15 @@ public class GameWindow extends JPanel implements ActionListener {
 				String playerInfo = Integer.toString(players.indexOf(pl)) + " : " + Integer.toString(pl.getHealth());
 				g.drawString(playerInfo, pl.getX(), pl.getY());
 //                pl.draw(g);
+
 			}
 			List<Missile> ms = pl.getMissiles();
-
+			int diff = 0;
 			for (Missile missile : ms) {
 				if (missile.isVisible()) {
 					g.drawImage(bImage,missile.x, missile.y, bImage.getHeight(), bImage.getWidth(), null);
+					g.drawImage(bImage,pl.x + diff, pl.y + 20, bImage.getHeight(), bImage.getWidth(), null );
+					diff +=5;
 				}
 			}
 		}
@@ -283,7 +289,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		updateMissiles();
 		checkCollisions();
 		checkWinCondition();
-		
+
 		repaint();
 	}
 
@@ -293,6 +299,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		public void keyPressed(KeyEvent e) {
 			players.get(myID).keyPressed(e);
 			connection.send(players);
+			System.out.println(Arrays.toString(players.get(myID).getMissiles().toArray()));
 		}
 	}
 }
