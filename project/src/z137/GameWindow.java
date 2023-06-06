@@ -12,11 +12,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -24,7 +21,6 @@ import javax.swing.Timer;
 import common.Client;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 public class GameWindow extends JPanel implements ActionListener{
 
@@ -98,7 +94,9 @@ public class GameWindow extends JPanel implements ActionListener{
 	                connection = c;
 	                myID = id-1;
 	                repaint();
-	               // start gui
+	               // start gui chat
+	                ChatBox chatBox = new ChatBox(myID);
+	        	    chatBox.setVisible(true);
 	            });
 	        }
 	        catch (Exception e) {

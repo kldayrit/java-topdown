@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.SocketException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -27,12 +26,15 @@ public class ChatBox extends JFrame {
     private int chatWidth = 500;
     private int chatHeight = 350;
 
-    public ChatBox() {
+    private int myID;
+    public ChatBox(int myID) {
+    	this.myID = myID;
         initGUI();
         initNetwork();
     }
 
     private void initGUI() {
+
         setTitle("Chat");
         setSize(chatWidth, chatHeight);
         // calculate bottom right corner position
@@ -103,7 +105,7 @@ public class ChatBox extends JFrame {
 
     private void sendMessage(String message) {
         try {
-            message = "You: " + message;
+            message = "Player " + myID + " :" + message;
             byte[] buffer = message.getBytes();
             DatagramPacket datagram = new DatagramPacket(buffer, buffer.length, group, port);
             socket.send(datagram);
@@ -116,4 +118,4 @@ public class ChatBox extends JFrame {
         chatTextArea.append(message + "\n");
         chatTextArea.setCaretPosition(chatTextArea.getDocument().getLength());
     }
-} 
+}

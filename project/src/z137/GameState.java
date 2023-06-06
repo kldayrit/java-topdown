@@ -21,8 +21,6 @@ public class GameState implements Serializable{
     }
 
 	private void startGame() {
-		ChatBox chatBox = new ChatBox();
-        chatBox.setVisible(true);
 		players = new ArrayList<>();
 		players.add(new Player(0, 50,1,0));
 		players.add(new Player(400, 50,0,1));

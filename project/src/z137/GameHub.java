@@ -50,7 +50,7 @@ public class GameHub extends Hub {
      * now in progress -- is transmitted to both players.
      */
     protected void playerConnected(int playerID) {
-        if (getPlayerList().length == 1) {
+        if (getPlayerList().length == 2) {
             shutdownServerSocket();
             state.startFirstGame();
             sendToAll(state);
