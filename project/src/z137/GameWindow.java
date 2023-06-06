@@ -21,6 +21,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -36,7 +37,9 @@ public class GameWindow extends JPanel implements ActionListener {
 	public List<Player> players;
     BufferedImage pImage;
 	BufferedImage bImage;
+	Rectangle windowBounds;
 	int myID;
+	int winner;
 
 	private volatile boolean connecting;
 
@@ -44,13 +47,14 @@ public class GameWindow extends JPanel implements ActionListener {
 	public Timer timer;
 	public final int DELAY = 15;
 
-	public GameWindow(String hostName, int serverPortNumber) {
+	public GameWindow(String hostName, int serverPortNumber, JFrame f) {
 		// gui stuff
 		players = new ArrayList<>();
 		addKeyListener(new TAdapter());
 		setFocusable(true);
 		setBackground(Color.BLACK);
 		setPreferredSize(new Dimension(600, 600));
+		windowBounds = f.getBounds();
 		timer = new Timer(DELAY, this);
 		timer.start();
         try {
@@ -200,33 +204,55 @@ public class GameWindow extends JPanel implements ActionListener {
             Iterator<Missile> projectileIterator =ms.iterator();
             while (projectileIterator.hasNext()) {
                 Missile projectile = projectileIterator.next();
-
-                // Check collision with other sprites
-                for (Player otherSprite : players) {
-                    // Skip checking collision with itself
-                    if (otherSprite == pl) {
-                        continue;
-                    }
-
-                    // Check if the projectile intersects with the bounds of the other sprite
-                    if (projectile.getBounds().intersects(otherSprite.getBounds())) {
-                        otherSprite.setVisible(false);  // Set isVisible to false for the hit sprite
-                        pl.incrementScore();        // Increment score for the sprite that fired the projectile
-
-                        projectileIterator.remove();    // Remove the projectile from the list
-                        break;                          // Break the loop since a collision occurred
-                    }
+                if (!projectile.getBounds().intersects(windowBounds)) {
+	                // Check collision with other sprites
+	                for (Player otherSprite : players) {
+	                    // Skip checking collision with itself
+	                    if (otherSprite == pl) {
+	                        continue;
+	                    }
+	                    
+	                    // Check if the projectile intersects with the bounds of the other sprite
+	                    if (projectile.getBounds().intersects(otherSprite.getBounds())) {
+	                        otherSprite.decrementHealth();                        	
+	                        if(otherSprite.getHealth() == 0) {
+	                        	otherSprite.setVisible(false);  // Set isVisible to false for the hit sprite with health = 0
+	                        }
+	                        projectileIterator.remove();    // Remove the projectile from the list
+	                        break;                          // Break the loop since a collision occurred
+	                    }
+	                }
+                } else {
+                    // Projectile hit the window boundaries, remove it from the sprite's list
+                    projectileIterator.remove();
                 }
             }
         }
     }
+	
+	public void checkWinCondition() {
+		int count = 0;
+	    
+	    for (Player pl : players) {
+	        if (pl.isVisible()) {
+	            count++;
+	            winner = players.indexOf(pl);
+	        }
+	    }
+	    
+	    if(count == 1) {
+	    	state.ingame = false;
+//	    	connection.send(state.ingame);
+	    }
+	}
 
 	private void drawObjects(Graphics g) {
 		for (Player pl : players) {
 			if (pl.isVisible()) {
 				g.drawImage(pImage,pl.x, pl.y, 20, 20, null);
 				g.setColor(Color.WHITE);
-				g.drawString(Integer.toString(players.indexOf(pl)), pl.getX(), pl.getY());
+				String playerInfo = Integer.toString(players.indexOf(pl)) + " : " + Integer.toString(pl.getHealth());
+				g.drawString(playerInfo, pl.getX(), pl.getY());
 //                pl.draw(g);
 			}
 			List<Missile> ms = pl.getMissiles();
@@ -247,6 +273,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		g.setColor(Color.white);
 		g.setFont(small);
 		g.drawString(msg, (600 - fm.stringWidth(msg)) / 2, 600 / 2);
+		g.drawString("Player " + Integer.toString(winner) + " won!", ((600 - fm.stringWidth(msg)) / 2)-10, (600 / 2) + 50);
 	}
 
 	@Override
@@ -254,9 +281,9 @@ public class GameWindow extends JPanel implements ActionListener {
 
 		inGame();
 		updateMissiles();
-
 		checkCollisions();
-
+		checkWinCondition();
+		
 		repaint();
 	}
 

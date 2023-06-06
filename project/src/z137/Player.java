@@ -18,7 +18,7 @@ public class Player extends Sprite {
 	int dx;
 	int dy;
 	int id;
-	private int score;
+	private int health = 4;
 	private List<Missile> missiles;
 	String imagePath = "/images/player.png";
 
@@ -62,8 +62,8 @@ public class Player extends Sprite {
 		return missiles;
 	}
 	
-	public void incrementScore() {
-		this.score+=1;
+	public void decrementHealth() {
+		this.setHealth(this.getHealth() - 1);
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -71,7 +71,9 @@ public class Player extends Sprite {
 		int key = e.getKeyCode();
 
 		if (key == KeyEvent.VK_SPACE) {
-			fire();
+			if(missiles.size() < 4) {				
+				fire();
+			}
 		}
 
 		if (key == KeyEvent.VK_RIGHT) {
@@ -112,12 +114,12 @@ public class Player extends Sprite {
 		missiles.add(new Missile(x + width, y + height / 2, this.dx, this.dy));
 	}
 
-	public int getScore() {
-		return score;
+	public int getHealth() {
+		return health;
 	}
 
-	public void setScore(int score) {
-		this.score = score;
+	public void setHealth(int health) {
+		this.health = health;
 	}
 
 }

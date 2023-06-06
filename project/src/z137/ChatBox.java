@@ -45,6 +45,7 @@ public class ChatBox extends JFrame {
         int chatY = screenHeight - chatHeight; // Y-coordinate for bottom right corner
         setBounds(chatX, chatY, chatWidth, chatHeight);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setAlwaysOnTop(true);
 
         chatTextArea = new JTextArea();
         chatTextArea.setEditable(false);

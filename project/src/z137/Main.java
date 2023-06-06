@@ -56,7 +56,7 @@ public class Main  extends JFrame implements ActionListener {
 	            catch (Exception a) {
 	                return;
 	            }
-	            f.add(new GameWindow("localhost", port));
+	            f.add(new GameWindow("localhost", port, f));
 
 	        }
 	        if(e.getSource() == button2){
@@ -72,12 +72,13 @@ public class Main  extends JFrame implements ActionListener {
 	            catch (Exception a) {
 	                return;
 	            }
-	            f.add(new GameWindow(host, port));
+	            f.add(new GameWindow(host, port, f));
 //
 	        }
 	        f.setResizable(false);
             f.setVisible(true);
             f.pack();
+            f.setAlwaysOnTop(true);
             setTitle("4thImpact : SPACE - FIRE, RIGHT KEY - MOVE");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

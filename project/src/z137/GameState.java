@@ -9,12 +9,15 @@ public class GameState implements Serializable{
 	public boolean ingame;
 	public boolean playerDisconnected;
 
-
 	public void applyMessage(int sender, Object message) {
 		if(ingame){
 			List<Player> sent = (List<Player>) message;
 			this.players = sent;
 		}
+//		if(message instanceof Boolean ){
+//			boolean s = (boolean) message;
+//			this.ingame = s;
+//		}
     }
 	void startFirstGame() {
         startGame();
