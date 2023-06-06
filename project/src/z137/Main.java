@@ -1,6 +1,12 @@
 package z137;
-
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.util.Scanner;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JFrame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,21 +16,25 @@ public class Main  extends JFrame implements ActionListener {
 
 	private JButton button1;
 	private JButton button2;
+	private JLabel label;
 
     public Main(){
-
+    	JLabel label = new JLabel("4TH IMPACT");
+        label.setBounds(95, 50, 200, 50); // Set x, y, width, height
+        label.setFont(new Font("Arial", Font.BOLD, 32)); // Set font style
+        add(label);
 	    button1=new JButton("Server");
-	    button1.setBounds(50,100,95,30);
+	    button1.setBounds(80,150,95,30);
 	    this.button1.addActionListener(this);
 	    add(button1);
 	    button2=new JButton("Client");
-	    button2.setBounds(200,100,95,30);
+	    button2.setBounds(200,150,95,30);
 	    this.button2.addActionListener(this);
 	    add(button2);
 	    setSize(400,400);
 	    setLayout(null);
 	    setVisible(true);
-        setTitle("4TH IMPACT");
+	    setTitle("4thImpact : Menu");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -68,8 +78,7 @@ public class Main  extends JFrame implements ActionListener {
 	        f.setResizable(false);
             f.setVisible(true);
             f.pack();
-            f.setAlwaysOnTop(true);
-            setTitle("4TH IMPACT");
+            setTitle("4thImpact : SPACE - FIRE, RIGHT KEY - MOVE");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             this.setVisible(false);
