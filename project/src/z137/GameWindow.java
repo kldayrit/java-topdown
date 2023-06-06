@@ -25,7 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+//import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import common.Client;
 
@@ -60,7 +60,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		timer = new Timer(DELAY, this);
 		timer.start();
         try {
-			pImage = ImageIO.read(getClass().getResource("/images/player.png"));
+			pImage = ImageIO.read(getClass().getResource("/images/alien.png"));
 			bImage = ImageIO.read(getClass().getResource("/images/shot.png"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

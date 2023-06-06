@@ -8,6 +8,7 @@ import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import common.Hub;
@@ -65,7 +66,7 @@ public class Main  extends JFrame implements ActionListener {
 
 	        }
 	        if(e.getSource() == button2){
-	        	String host = "localhost";
+	        	String host = JOptionPane.showInputDialog(this, "Enter the host address:");
 	            int port = 5000;
 	            if (host.length() == 0) {
 	                return;
