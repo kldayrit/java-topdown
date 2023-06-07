@@ -14,6 +14,7 @@ public class Sprite implements Serializable {
 	protected int height;
 	protected boolean visible;
 	transient protected Image image;
+	protected boolean showExplosion = false;
 
 	public Sprite(int x, int y) {
 		this.x = x;
@@ -32,6 +33,10 @@ public class Sprite implements Serializable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	protected void setShowExplosion(boolean bool) {
+		this.showExplosion = bool;
 	}
 
 	public void draw(Graphics g) {

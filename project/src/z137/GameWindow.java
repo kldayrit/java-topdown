@@ -39,6 +39,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	public List<Player> players;
     BufferedImage pImage;
 	BufferedImage bImage;
+	BufferedImage impactImage;
 	Rectangle windowBounds;
 	int myID;
 	int winner;
@@ -62,6 +63,7 @@ public class GameWindow extends JPanel implements ActionListener {
         try {
 			pImage = ImageIO.read(getClass().getResource("/images/alien.png"));
 			bImage = ImageIO.read(getClass().getResource("/images/shot.png"));
+			impactImage = ImageIO.read(getClass().getResource("/images/explosion.png"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -219,6 +221,14 @@ public class GameWindow extends JPanel implements ActionListener {
 	                        otherSprite.decrementHealth();
 	                        if(otherSprite.getHealth() == 0) {
 	                        	otherSprite.setVisible(false);  // Set isVisible to false for the hit sprite with health = 0
+	                        	 otherSprite.setShowExplosion(true);
+
+	                             // Use a timer to delay the removal of the impact image
+	                             Timer timer = new Timer(500, e -> {
+	                                 otherSprite.setShowExplosion(false);  // Clear the impact image after 0.2 seconds
+	                             });
+	                             timer.setRepeats(false);  // Execute the timer only once
+	                             timer.start();
 	                        }
 	                        projectileIterator.remove();    // Remove the projectile from the list
 	                        break;                          // Break the loop since a collision occurred
@@ -257,7 +267,9 @@ public class GameWindow extends JPanel implements ActionListener {
 				String playerInfo = Integer.toString(players.indexOf(pl)) + " : " + Integer.toString(pl.getHealth());
 				g.drawString(playerInfo, pl.getX(), pl.getY());
 //                pl.draw(g);
-
+			}
+			if (pl.showExplosion) {
+				g.drawImage(impactImage,pl.x, pl.y, 20, 20, null);
 			}
 			List<Missile> ms = pl.getMissiles();
 			int diff = 0;
