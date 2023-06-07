@@ -143,24 +143,37 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 	
 	private void createWalls() {
-		// Create and add wall objects to the list
-		int numWalls = 5;
-		int wallWidth = 2;
-		int wallHeight = 5;
-		int boardWidth = getWidth();
-		int boardHeight = getHeight();
-
-		int unitSize = Math.min(boardWidth / (wallWidth * numWalls), boardHeight / wallHeight);
-
-		int startX = (boardWidth - unitSize * wallWidth * numWalls) / 2; // Starting x-coordinate for the walls
-		int startY = (boardHeight - unitSize * wallHeight) / 2; // Starting y-coordinate for the walls
-
-		for (int i = 0; i < numWalls; i++) {
-			int x = startX + i * unitSize * wallWidth;
-			int y = startY;
-			Wall wall = new Wall(x, y, wallWidth, wallHeight, wallImage);
-			walls.add(wall);
-		}
+//		// Create and add wall objects to the list
+		int numWalls = 1;
+		int wallWidth = 20;    //final wallwidth
+		int wallHeight = 100;	//final wallheight
+		
+		
+		Wall wall = new Wall(10, 10, wallWidth, wallHeight, wallImage);
+		walls.add(wall);
+		
+		Wall wall2 = new Wall(250, 250, wallWidth, wallHeight, wallImage);
+		walls.add(wall);
+		walls.add(wall2);
+		
+//		int boardWidth = getWidth();
+//		int boardHeight = getHeight();
+//
+//		int unitSize = 5;
+//
+//		int startX = (boardWidth - unitSize * wallWidth * numWalls) / 2; // Starting x-coordinate for the walls
+//		int startY = (boardHeight - unitSize * wallHeight) / 2; // Starting y-coordinate for the walls
+//		int multiplier = 100;
+//		int start = 5;
+//		for (int i = 0; i < numWalls; i++) {
+//			int x = start*multiplier;
+//			int y = start*multiplier;
+//			Wall wall = new Wall(x, y, wallWidth, wallHeight, wallImage);
+//			walls.add(wall);
+//			multiplier++;
+//			start+=10;
+//		}
+		
 	}
 
 	@Override
@@ -277,7 +290,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
 	private void drawObjects(Graphics g) {
 		for (Wall wall : walls) {
-				wall.draw(g);
+				g.drawImage(wallImage.getSubimage(5,5,15,100), wall.x, wall.y, wall.width, wall.height,null);
 			}
 			
 		for (Player pl : players) {
